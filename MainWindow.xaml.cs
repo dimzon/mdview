@@ -44,7 +44,7 @@ public partial class MainWindow : Window
         ApplyTheme(_isDark);
         ApplyLanguage(_language);
 
-        SourceInitialized += (_, _) => ApplyTitleBarTheme();
+        SourceInitialized += (_, _) => ApplyTitleBarTheme(this, _isDark);
 
         AllowDrop = true;
         AddHandler(DragDrop.DragOverEvent, new DragEventHandler(OnDragOver), true);
@@ -184,16 +184,16 @@ public partial class MainWindow : Window
         if (dictionaries.Count == 0)
             return;
         dictionaries[0].Source = new Uri($"Themes/{(dark ? "Dark" : "Light")}.xaml", UriKind.Relative);
-        ApplyTitleBarTheme();
+        ApplyTitleBarTheme(this, dark);
     }
 
     /// <summary>Тёмный заголовок окна через DWM (Win10/11).</summary>
-    private void ApplyTitleBarTheme()
+    private static void ApplyTitleBarTheme(Window window, bool dark)
     {
-        var handle = new WindowInteropHelper(this).Handle;
+        var handle = new WindowInteropHelper(window).Handle;
         if (handle == IntPtr.Zero)
             return;
-        var useDark = _isDark ? 1 : 0;
+        var useDark = dark ? 1 : 0;
         // 20 = DWMWA_USE_IMMERSIVE_DARK_MODE; на ранних сборках Win10 атрибут имеет номер 19
         if (DwmSetWindowAttribute(handle, 20, ref useDark, sizeof(int)) != 0)
             DwmSetWindowAttribute(handle, 19, ref useDark, sizeof(int));
@@ -307,10 +307,21 @@ public partial class MainWindow : Window
             ResizeMode = ResizeMode.NoResize,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Owner = this,
+            ShowInTaskbar = false,
             Background = TryFindResource("BgBrush") as Brush ?? Brushes.White,
             Content = panel,
         };
-        about.ShowDialog();
+        // заголовок About согласуется с темой приложения, а не с темой Windows
+        about.SourceInitialized += (_, _) => ApplyTitleBarTheme(about, _isDark);
+        try
+        {
+            about.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, "About: " + ex.Message,
+                "mdview", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     // ---------- Обработчики меню ----------

@@ -147,7 +147,15 @@
             <ControlTemplate x:Key="MenuSubHeaderTemplate" TargetType="MenuItem">
                 <Border x:Name="Bd" Background="Transparent" Padding="10,6">
                     <Grid>
-                        <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- пустая колонка выравнивает подменю с остальными пунктами -->
+                        <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True"/>
+                        <TextBlock Grid.Column="2" Text="▸" Margin="24,0,0,0"
+                                   Foreground="{DynamicResource MutedBrush}"/>
                         <Popup x:Name="PART_Popup" Placement="Right"
                                IsOpen="{TemplateBinding IsSubmenuOpen}"
                                AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
