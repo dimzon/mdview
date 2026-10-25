@@ -58,12 +58,13 @@ public static class MarkdownConverter
     {
         public required string BasePath { get; init; }
         public Action<string>? OpenFile { get; init; }
+        public bool SyntaxHighlight { get; init; } = true;
         public List<TocEntry> Toc { get; } = new();
     }
 
-    public static ConversionResult Convert(string markdown, string basePath, Action<string>? openFile = null)
+    public static ConversionResult Convert(string markdown, string basePath, Action<string>? openFile = null, bool syntaxHighlight = true)
     {
-        var ctx = new Ctx { BasePath = basePath, OpenFile = openFile };
+        var ctx = new Ctx { BasePath = basePath, OpenFile = openFile, SyntaxHighlight = syntaxHighlight };
         var ast = Markdown.Parse(markdown, Pipeline);
 
         var doc = new FlowDocument
@@ -106,7 +107,7 @@ public static class MarkdownConverter
             }
 
             case MdCodeBlock code: // покрывает и FencedCodeBlock, и indented code
-                return ConvertCode(code);
+                return ConvertCode(code, ctx);
 
             case MdListBlock list:
                 return ConvertList(list, ctx);
@@ -146,30 +147,47 @@ public static class MarkdownConverter
         return para;
     }
 
-    private static Block ConvertCode(MdCodeBlock code)
+    private static Block ConvertCode(MdCodeBlock code, Ctx ctx)
     {
-        var box = new TextBox
+        var codeText = code.Lines.ToString().TrimEnd();
+        var lang = (code as Markdig.Syntax.FencedCodeBlock)?.Info;
+        var box = new RichTextBox
         {
-            Text = code.Lines.ToString().TrimEnd(),
             IsReadOnly = true,
-            AcceptsReturn = true,
-            FontFamily = MonoFont,
-            FontSize = 13,
             BorderThickness = new Thickness(0),
             Background = Brushes.Transparent,
             Padding = new Thickness(0),
-            TextWrapping = TextWrapping.NoWrap,
+            FontFamily = MonoFont,
+            FontSize = 13,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
         };
         box.SetResourceReference(Control.ForegroundProperty, "FgBrush");
+        box.Document.PagePadding = new Thickness(0);
+
+        // подсветка (если включена и язык известен)
+        var profile = ctx.SyntaxHighlight ? SyntaxHighlighter.GetProfile(lang) : null;
+        if (profile is not null)
+        {
+            var paragraph = new Paragraph { Margin = new Thickness(0) };
+            foreach (var (text, brushKey) in SyntaxHighlighter.Tokenize(codeText, profile))
+            {
+                var run = new Run(text);
+                run.SetResourceReference(TextElement.ForegroundProperty, brushKey);
+                paragraph.Inlines.Add(run);
+            }
+            box.Document.Blocks.Add(paragraph);
+        }
+        else
+        {
+            box.Document.Blocks.Add(new Paragraph(new Run(codeText)) { Margin = new Thickness(0) });
+        }
 
         // шапка: язык (если указан) слева, кнопка «Копировать» справа
         var header = new Grid { Margin = new Thickness(0, 0, 0, 6) };
         header.ColumnDefinitions.Add(new ColumnDefinition());
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-        var lang = (code as Markdig.Syntax.FencedCodeBlock)?.Info;
         if (!string.IsNullOrWhiteSpace(lang))
         {
             var langText = new TextBlock
@@ -204,7 +222,7 @@ public static class MarkdownConverter
         {
             try
             {
-                System.Windows.Clipboard.SetText(box.Text);
+                System.Windows.Clipboard.SetText(codeText);
                 ((TextBlock)copyButton.Child).Text = L10n.L("Lang.Copied");
                 var timer = new System.Windows.Threading.DispatcherTimer
                 {

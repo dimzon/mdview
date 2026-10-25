@@ -55,6 +55,7 @@
                         <MenuItem x:Name="EnglishItem" Header="{DynamicResource Lang.English}" IsCheckable="True" Click="OnLanguageClick"/>
                         <MenuItem x:Name="RussianItem" Header="{DynamicResource Lang.Russian}" IsCheckable="True" Click="OnLanguageClick"/>
                     </MenuItem>
+                    <MenuItem x:Name="HighlightItem" Header="{DynamicResource Lang.ViewHighlight}" IsCheckable="True" Click="OnToggleHighlight"/>
                     <Separator/>
                     <MenuItem Header="{DynamicResource Lang.ViewToc}" InputGestureText="Ctrl+T" Command="{x:Static local:MainWindow.ToggleTocCommand}"/>
                     <MenuItem Header="{DynamicResource Lang.ViewZoomIn}" InputGestureText="Ctrl +" Command="{x:Static local:MainWindow.ZoomInCommand}"/>

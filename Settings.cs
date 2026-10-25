@@ -16,6 +16,9 @@ public static class Settings
     /// <summary>Сохранённый язык ("en"/"ru"); null — берём язык системы.</summary>
     public static string? Language { get; private set; }
 
+    /// <summary>Подсветка синтаксиса в блоках кода.</summary>
+    public static bool HighlightCode { get; private set; } = true;
+
     public static void Load()
     {
         try
@@ -32,6 +35,8 @@ public static class Settings
                     Theme = value;
                 if (key == "lang" && value is "en" or "ru" or "auto")
                     Language = value == "auto" ? null : value;
+                if (key == "highlight")
+                    HighlightCode = value != "off";
             }
         }
         catch { /* настройки не критичны */ }
@@ -49,6 +54,12 @@ public static class Settings
         Save();
     }
 
+    public static void SetHighlight(bool on)
+    {
+        HighlightCode = on;
+        Save();
+    }
+
     private static void Save()
     {
         try
@@ -57,6 +68,7 @@ public static class Settings
             var sb = new StringBuilder();
             sb.Append("theme=").Append(Theme ?? "auto").AppendLine();
             sb.Append("lang=").Append(Language ?? "auto").AppendLine();
+            sb.Append("highlight=").Append(HighlightCode ? "on" : "off").AppendLine();
             File.WriteAllText(FilePath, sb.ToString());
         }
         catch { /* настройки не критичны */ }

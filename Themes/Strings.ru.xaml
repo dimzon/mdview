@@ -13,6 +13,7 @@
     <sys:String x:Key="Lang.ViewThemeAuto">_Авто</sys:String>
     <sys:String x:Key="Lang.ViewThemeLight">С_ветлая</sys:String>
     <sys:String x:Key="Lang.ViewThemeDark">Т_ёмная</sys:String>
+    <sys:String x:Key="Lang.ViewHighlight">Подсветка _кода</sys:String>
     <sys:String x:Key="Lang.ViewLanguage">_Язык</sys:String>
     <sys:String x:Key="Lang.System">_Как в системе</sys:String>
     <sys:String x:Key="Lang.English">English</sys:String>

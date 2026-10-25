@@ -12,4 +12,10 @@
     <SolidColorBrush x:Key="MenuHoverBrush" Color="#EDEDED"/>
     <SolidColorBrush x:Key="ScrollBarBrush" Color="#C4C4C4"/>
     <SolidColorBrush x:Key="ScrollBarHoverBrush" Color="#9E9E9E"/>
+    <!-- VS Code Light+ -->
+    <SolidColorBrush x:Key="SyntaxCommentBrush" Color="#008000"/>
+    <SolidColorBrush x:Key="SyntaxStringBrush" Color="#A31515"/>
+    <SolidColorBrush x:Key="SyntaxKeywordBrush" Color="#0000FF"/>
+    <SolidColorBrush x:Key="SyntaxNumberBrush" Color="#098658"/>
+    <SolidColorBrush x:Key="SyntaxFunctionBrush" Color="#795E26"/>
 </ResourceDictionary>

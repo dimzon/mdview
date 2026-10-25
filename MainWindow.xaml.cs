@@ -41,6 +41,7 @@ public partial class MainWindow : Window
         _isDark = ResolveTheme();
         _language = ResolveLanguage();
         SyncLanguageMenu();
+        HighlightItem.IsChecked = Settings.HighlightCode;
         ApplyTheme(_isDark);
         ApplyLanguage(_language);
 
@@ -93,6 +94,13 @@ public partial class MainWindow : Window
         ApplyLanguage(ResolveLanguage());
     }
 
+    private void OnToggleHighlight(object sender, RoutedEventArgs e)
+    {
+        Settings.SetHighlight(HighlightItem.IsChecked);
+        if (_currentPath is not null)
+            OpenFile(_currentPath); // пересоздать документ с новым режимом подсветки
+    }
+
     // ---------- Открытие файлов ----------
 
     private void OpenFile(string path)
@@ -103,7 +111,8 @@ public partial class MainWindow : Window
             var result = MarkdownConverter.Convert(
                 markdown,
                 Path.GetDirectoryName(Path.GetFullPath(path))!,
-                OpenFile); // относительные ссылки .md открываются в этом же окне
+                OpenFile, // относительные ссылки .md открываются в этом же окне
+                Settings.HighlightCode);
 
             Viewer.Document = result.Document;
             _currentPath = path;

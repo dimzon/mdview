@@ -13,6 +13,7 @@
     <sys:String x:Key="Lang.ViewThemeAuto">_Auto</sys:String>
     <sys:String x:Key="Lang.ViewThemeLight">_Light</sys:String>
     <sys:String x:Key="Lang.ViewThemeDark">_Dark</sys:String>
+    <sys:String x:Key="Lang.ViewHighlight">_Code highlighting</sys:String>
     <sys:String x:Key="Lang.ViewLanguage">_Language</sys:String>
     <sys:String x:Key="Lang.System">_System default</sys:String>
     <sys:String x:Key="Lang.English">English</sys:String>
