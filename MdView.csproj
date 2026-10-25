@@ -14,6 +14,8 @@
     <DebugType>embedded</DebugType>
     <RepositoryUrl>https://github.com/dimzon/mdview</RepositoryUrl>
     <PackageProjectUrl>https://github.com/dimzon/mdview</PackageProjectUrl>
+    <!-- MinVer 6.x по умолчанию не использует префикс; у нас релизные теги вида v1.2.3 -->
+    <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>
 
   <ItemGroup>
