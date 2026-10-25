@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # нужна история и теги для MinVer
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish (framework-dependent, ~0.7 MB)
+        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/fd
+
+      - name: Publish (self-contained, no runtime required)
+        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/sc
+
+      - name: Pack distributions
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}"
+          Compress-Archive -Path publish/fd/mdview.exe -DestinationPath "mdview-$v-win-x64.zip"
+          Compress-Archive -Path publish/sc/mdview.exe -DestinationPath "mdview-$v-win-x64-selfcontained.zip"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            mdview-*-win-x64.zip
+            mdview-*-win-x64-selfcontained.zip
+          generate_release_notes: true

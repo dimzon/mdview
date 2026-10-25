@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>MdView</RootNamespace>
+    <AssemblyName>mdview</AssemblyName>
+    <Version>1.0.0</Version>
+    <Description>Лёгкий просмотрщик Markdown на WPF (FlowDocument)</Description>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <DebugType>embedded</DebugType>
+    <RepositoryUrl>https://github.com/dimzon/mdview</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/dimzon/mdview</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" Version="0.41.*" />
+    <!-- Версия сборки вычисляется из git-тегов v* (см. https://github.com/adamralph/minver) -->
+    <PackageReference Include="MinVer" Version="6.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="Lang.File">_Файл</sys:String>
+    <sys:String x:Key="Lang.FileOpen">_Открыть...</sys:String>
+    <sys:String x:Key="Lang.FileReload">_Обновить</sys:String>
+    <sys:String x:Key="Lang.FilePrint">_Печать...</sys:String>
+    <sys:String x:Key="Lang.FileSaveXps">Со_хранить как XPS...</sys:String>
+    <sys:String x:Key="Lang.FileExit">_Выход</sys:String>
+
+    <sys:String x:Key="Lang.View">_Вид</sys:String>
+    <sys:String x:Key="Lang.ViewDarkTheme">_Тёмная тема</sys:String>
+    <sys:String x:Key="Lang.ViewLanguage">_Язык</sys:String>
+    <sys:String x:Key="Lang.System">_Как в системе</sys:String>
+    <sys:String x:Key="Lang.English">English</sys:String>
+    <sys:String x:Key="Lang.Russian">Русский</sys:String>
+    <sys:String x:Key="Lang.ViewToc">_Оглавление</sys:String>
+    <sys:String x:Key="Lang.ViewZoomIn">_Увеличить</sys:String>
+    <sys:String x:Key="Lang.ViewZoomOut">У_меньшить</sys:String>
+    <sys:String x:Key="Lang.ViewZoomReset">_Сбросить масштаб</sys:String>
+
+    <sys:String x:Key="Lang.Help">_Справка</sys:String>
+    <sys:String x:Key="Lang.HelpRepo">Открыть репозиторий на _GitHub</sys:String>
+    <sys:String x:Key="Lang.HelpAbout">_О программе mdview</sys:String>
+    <sys:String x:Key="Lang.TocTitle">Оглавление</sys:String>
+
+    <sys:String x:Key="Msg.OpenError">Не удалось открыть файл:</sys:String>
+    <sys:String x:Key="Msg.DropUnsupported">Поддерживаются файлы .md, .markdown, .mdown, .mkd, .txt</sys:String>
+    <sys:String x:Key="Msg.UnexpectedError">Непредвиденная ошибка:</sys:String>
+    <sys:String x:Key="Msg.PrintError">Не удалось напечатать:</sys:String>
+    <sys:String x:Key="Msg.XpsError">Не удалось сохранить XPS:</sys:String>
+    <sys:String x:Key="Msg.XpsTitle">Сохранить как XPS</sys:String>
+    <sys:String x:Key="Msg.XpsFilter">XPS-документ (*.xps)|*.xps</sys:String>
+    <sys:String x:Key="Msg.DefaultDocName">документ</sys:String>
+    <sys:String x:Key="Msg.FilterMd">Markdown (*.md;*.markdown;*.mdown;*.mkd)|*.md;*.markdown;*.mdown;*.mkd</sys:String>
+    <sys:String x:Key="Msg.FilterTxt">Текстовые файлы (*.txt)|*.txt</sys:String>
+    <sys:String x:Key="Msg.FilterAll">Все файлы (*.*)|*.*</sys:String>
+
+    <sys:String x:Key="Welcome.Lead">Лёгкий просмотрщик Markdown. Откройте файл:</sys:String>
+    <sys:String x:Key="Welcome.HintDialog">Ctrl+O — диалог открытия</sys:String>
+    <sys:String x:Key="Welcome.HintDrop">перетащите .md-файл в окно</sys:String>
+    <sys:String x:Key="Welcome.HintCli">или запустите: mdview.exe readme.md</sys:String>
+    <sys:String x:Key="Welcome.Hints">Ctrl+T — оглавление, F5 — обновить, Ctrl+колесо — масштаб. Печать — Ctrl+P. Тёмная тема — в меню «Вид».</sys:String>
+
+    <sys:String x:Key="About.Title">О программе mdview</sys:String>
+    <sys:String x:Key="About.Tagline">Лёгкий просмотрщик Markdown для Windows (.NET 8 + WPF FlowDocument)</sys:String>
+    <sys:String x:Key="About.Version">Версия</sys:String>
+    <sys:String x:Key="About.Repo">Исходный код на GitHub</sys:String>
+</ResourceDictionary>
