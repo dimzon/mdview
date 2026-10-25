@@ -26,6 +26,10 @@
 
   <ItemGroup>
     <Resource Include="Assets\app.ico" />
+    <!-- инструкция хранится в ресурсах WPF: pack://application:,,,/Assets/HELP.*.md -->
+    <None Remove="Assets\HELP.*.md" />
+    <Resource Include="Assets\HELP.ru.md" />
+    <Resource Include="Assets\HELP.en.md" />
   </ItemGroup>
 
 </Project>

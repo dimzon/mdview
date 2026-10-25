@@ -143,46 +143,29 @@ public partial class MainWindow : Window
 
     private void ShowWelcome()
     {
-        var doc = new FlowDocument
+        // встроенная инструкция из ресурсов WPF (локализована)
+        var resourcePath = _language == "ru"
+            ? "pack://application:,,,/Assets/HELP.ru.md"
+            : "pack://application:,,,/Assets/HELP.en.md";
+        string markdown;
+        try
         {
-            FontFamily = new FontFamily("Segoe UI"),
-            FontSize = 14.5,
-            PagePadding = new Thickness(35, 15, 45, 30),
-            Background = Brushes.Transparent,
-        };
-        doc.SetResourceReference(TextElement.ForegroundProperty, "FgBrush");
-
-        doc.Blocks.Add(new Paragraph(new Run("mdview"))
+            var sri = Application.GetResourceStream(new Uri(resourcePath));
+            if (sri is null)
+                throw new InvalidOperationException("HELP resource not found");
+            using var reader = new StreamReader(sri.Stream);
+            markdown = reader.ReadToEnd();
+        }
+        catch
         {
-            FontSize = 30,
-            FontWeight = FontWeights.Bold,
-            Margin = new Thickness(0, 40, 0, 10),
-        });
-        doc.Blocks.Add(new Paragraph(new Run(L10n.L("Welcome.Lead"))));
+            markdown = "# mdview\n\nНе удалось загрузить встроенную инструкцию.";
+        }
 
-        var list = new List { Margin = new Thickness(0, 0, 0, 10), Padding = new Thickness(24, 0, 0, 0) };
-        AddHint(list, L10n.L("Welcome.HintDialog"));
-        AddHint(list, L10n.L("Welcome.HintDrop"));
-        AddHint(list, L10n.L("Welcome.HintCli"));
-        doc.Blocks.Add(list);
-
-        var hint = new Paragraph(new Run(L10n.L("Welcome.Hints")))
-        {
-            Margin = new Thickness(0, 10, 0, 0),
-        };
-        hint.SetResourceReference(TextElement.ForegroundProperty, "MutedBrush");
-        doc.Blocks.Add(hint);
-
-        Viewer.Document = doc;
+        var result = MarkdownConverter.Convert(markdown, AppContext.BaseDirectory, OpenFile, Settings.HighlightCode);
+        Viewer.Document = result.Document;
         Title = "mdview";
-        TocList.ItemsSource = null;
+        TocList.ItemsSource = result.Toc;
         _currentPath = null;
-    }
-
-    private static void AddHint(List list, string text)
-    {
-        list.ListItems.Add(new ListItem(
-            new Paragraph(new Run(text)) { Margin = new Thickness(0, 0, 0, 3) }));
     }
 
     // ---------- Тема ----------
