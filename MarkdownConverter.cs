@@ -51,7 +51,7 @@ public static class MarkdownConverter
                          | EmphasisExtraOptions.Subscript)
         .Build();
 
-    private static readonly FontFamily MonoFont = new("Cascadia Mono, Consolas, Courier New");
+    private static readonly FontFamily MonoFont = new("Consolas, Courier New");
     private static readonly double[] HeadingSizes = { 26, 22, 18, 15.5, 14, 13.5 };
 
     private sealed class Ctx
@@ -151,71 +151,65 @@ public static class MarkdownConverter
     {
         var codeText = code.Lines.ToString().TrimEnd();
         var lang = (code as Markdig.Syntax.FencedCodeBlock)?.Info;
-        var box = new RichTextBox
+
+        // TextBlock с TextWrapping=NoWrap: длинные строки не переносятся,
+        // а уходят в горизонтальный скроллбар (как в обычных редакторах кода)
+        var textBlock = new TextBlock
         {
-            IsReadOnly = true,
-            BorderThickness = new Thickness(0),
-            Background = Brushes.Transparent,
-            Padding = new Thickness(0),
             FontFamily = MonoFont,
             FontSize = 13,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            TextWrapping = TextWrapping.NoWrap,
+            Background = Brushes.Transparent,
         };
-        box.SetResourceReference(Control.ForegroundProperty, "FgBrush");
-        box.Document.PagePadding = new Thickness(0);
+        textBlock.SetResourceReference(TextElement.ForegroundProperty, "FgBrush");
 
         // подсветка (если включена и язык известен)
         var profile = ctx.SyntaxHighlight ? SyntaxHighlighter.GetProfile(lang) : null;
-        if (profile is not null)
+        var lines = codeText.Split('\n');
+        for (var li = 0; li < lines.Length; li++)
         {
-            var paragraph = new Paragraph { Margin = new Thickness(0) };
-            foreach (var (text, brushKey) in SyntaxHighlighter.Tokenize(codeText, profile))
+            if (li > 0)
+                textBlock.Inlines.Add(new LineBreak());
+            if (profile is not null)
             {
-                var run = new Run(text);
-                run.SetResourceReference(TextElement.ForegroundProperty, brushKey);
-                paragraph.Inlines.Add(run);
+                foreach (var (text, brushKey) in SyntaxHighlighter.Tokenize(lines[li], profile))
+                {
+                    var run = new Run(text);
+                    run.SetResourceReference(TextElement.ForegroundProperty, brushKey);
+                    textBlock.Inlines.Add(run);
+                }
             }
-            box.Document.Blocks.Add(paragraph);
-        }
-        else
-        {
-            box.Document.Blocks.Add(new Paragraph(new Run(codeText)) { Margin = new Thickness(0) });
-        }
-
-        // шапка: язык (если указан) слева, кнопка «Копировать» справа
-        var header = new Grid { Margin = new Thickness(0, 0, 0, 6) };
-        header.ColumnDefinitions.Add(new ColumnDefinition());
-        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-        if (!string.IsNullOrWhiteSpace(lang))
-        {
-            var langText = new TextBlock
+            else
             {
-                Text = lang,
-                FontFamily = MonoFont,
-                FontSize = 11.5,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            langText.SetResourceReference(TextElement.ForegroundProperty, "MutedBrush");
-            header.Children.Add(langText);
+                textBlock.Inlines.Add(new Run(lines[li]));
+            }
         }
 
+        var box = new ScrollViewer
+        {
+            Content = textBlock,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            Padding = new Thickness(0),
+        };
+
+        // кнопка «Копировать» — иконка, как принято в вебе, поверх блока справа сверху
+        var grid = new Grid();
+        grid.Children.Add(box);
+
+        var copyIcon = CreateCopyIcon();
         var copyButton = new Border
         {
-            Child = new TextBlock
-            {
-                Text = L10n.L("Lang.Copy"),
-                FontSize = 12,
-                Margin = new Thickness(8, 2, 8, 3),
-            },
+            Child = copyIcon,
+            Width = 28,
+            Height = 28,
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(4),
             Cursor = System.Windows.Input.Cursors.Hand,
             ToolTip = L10n.L("Lang.Copy"),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Top,
         };
-        Grid.SetColumn(copyButton, 1);
-        copyButton.SetResourceReference(TextElement.ForegroundProperty, "FgBrush");
         copyButton.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
         copyButton.SetResourceReference(Border.BackgroundProperty, "MenuBgBrush");
         copyButton.MouseLeftButtonDown += (_, _) =>
@@ -223,7 +217,10 @@ public static class MarkdownConverter
             try
             {
                 System.Windows.Clipboard.SetText(codeText);
-                ((TextBlock)copyButton.Child).Text = L10n.L("Lang.Copied");
+                copyIcon.Data = Geometry.Parse("M 2.5 7 L 5.5 10 L 11.5 3.5");
+                copyIcon.StrokeStartLineCap = PenLineCap.Round;
+                copyIcon.StrokeEndLineCap = PenLineCap.Round;
+                copyIcon.StrokeLineJoin = PenLineJoin.Round;
                 var timer = new System.Windows.Threading.DispatcherTimer
                 {
                     Interval = TimeSpan.FromSeconds(1.2),
@@ -231,21 +228,40 @@ public static class MarkdownConverter
                 timer.Tick += (_, _) =>
                 {
                     timer.Stop();
-                    ((TextBlock)copyButton.Child).Text = L10n.L("Lang.Copy");
+                    copyIcon.Data = CreateCopyIconData();
+                    copyIcon.StrokeStartLineCap = PenLineCap.Flat;
+                    copyIcon.StrokeEndLineCap = PenLineCap.Flat;
+                    copyIcon.StrokeLineJoin = PenLineJoin.Miter;
                 };
                 timer.Start();
             }
             catch { /* clipboard недоступен */ }
         };
-        header.Children.Add(copyButton);
+        grid.Children.Add(copyButton);
 
-        var grid = new Grid();
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition());
-        Grid.SetRow(header, 0);
-        Grid.SetRow(box, 1);
-        grid.Children.Add(header);
-        grid.Children.Add(box);
+        // язык блока — мелкая плашка слева от кнопки (тоже поверх кода)
+        if (!string.IsNullOrWhiteSpace(lang))
+        {
+            var langBadge = new Border
+            {
+                Child = new TextBlock
+                {
+                    Text = lang,
+                    FontFamily = MonoFont,
+                    FontSize = 11,
+                    Margin = new Thickness(7, 1, 7, 2),
+                },
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(4),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 0, 36, 0),
+            };
+            langBadge.SetResourceReference(TextElement.ForegroundProperty, "MutedBrush");
+            langBadge.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+            langBadge.SetResourceReference(Border.BackgroundProperty, "MenuBgBrush");
+            grid.Children.Add(langBadge);
+        }
 
         var border = new Border
         {
@@ -536,6 +552,27 @@ public static class MarkdownConverter
     }
 
     // ---------- Вспомогательные ----------
+
+    /// <summary>Иконка «копировать» (два квадратика) — стандартный веб-глиф.</summary>
+    private static Geometry CreateCopyIconData()
+    {
+        var group = new GeometryGroup();
+        group.Children.Add(new RectangleGeometry(new Rect(1.5, 1.5, 8.5, 8.5), 1.5, 1.5));
+        group.Children.Add(new RectangleGeometry(new Rect(5, 5, 8.5, 8.5), 1.5, 1.5));
+        return group;
+    }
+
+    private static System.Windows.Shapes.Path CreateCopyIcon()
+    {
+        var path = new System.Windows.Shapes.Path
+        {
+            Data = CreateCopyIconData(),
+            StrokeThickness = 1.4,
+            Stretch = Stretch.Fill,
+        };
+        path.SetResourceReference(System.Windows.Shapes.Shape.StrokeProperty, "FgBrush");
+        return path;
+    }
 
     /// <summary>Единый чекбокс: одинаковая рамка в обоих состояниях, галочка внутри.</summary>
     private static Inline TaskCheckbox(bool isChecked)
