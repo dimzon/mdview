@@ -164,13 +164,78 @@ public static class MarkdownConverter
         };
         box.SetResourceReference(Control.ForegroundProperty, "FgBrush");
 
+        // шапка: язык (если указан) слева, кнопка «Копировать» справа
+        var header = new Grid { Margin = new Thickness(0, 0, 0, 6) };
+        header.ColumnDefinitions.Add(new ColumnDefinition());
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        var lang = (code as Markdig.Syntax.FencedCodeBlock)?.Info;
+        if (!string.IsNullOrWhiteSpace(lang))
+        {
+            var langText = new TextBlock
+            {
+                Text = lang,
+                FontFamily = MonoFont,
+                FontSize = 11.5,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            langText.SetResourceReference(TextElement.ForegroundProperty, "MutedBrush");
+            header.Children.Add(langText);
+        }
+
+        var copyButton = new Border
+        {
+            Child = new TextBlock
+            {
+                Text = L10n.L("Lang.Copy"),
+                FontSize = 12,
+                Margin = new Thickness(8, 2, 8, 3),
+            },
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(4),
+            Cursor = System.Windows.Input.Cursors.Hand,
+            ToolTip = L10n.L("Lang.Copy"),
+        };
+        Grid.SetColumn(copyButton, 1);
+        copyButton.SetResourceReference(TextElement.ForegroundProperty, "FgBrush");
+        copyButton.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+        copyButton.SetResourceReference(Border.BackgroundProperty, "MenuBgBrush");
+        copyButton.MouseLeftButtonDown += (_, _) =>
+        {
+            try
+            {
+                System.Windows.Clipboard.SetText(box.Text);
+                ((TextBlock)copyButton.Child).Text = L10n.L("Lang.Copied");
+                var timer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(1.2),
+                };
+                timer.Tick += (_, _) =>
+                {
+                    timer.Stop();
+                    ((TextBlock)copyButton.Child).Text = L10n.L("Lang.Copy");
+                };
+                timer.Start();
+            }
+            catch { /* clipboard недоступен */ }
+        };
+        header.Children.Add(copyButton);
+
+        var grid = new Grid();
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition());
+        Grid.SetRow(header, 0);
+        Grid.SetRow(box, 1);
+        grid.Children.Add(header);
+        grid.Children.Add(box);
+
         var border = new Border
         {
             CornerRadius = new CornerRadius(5),
-            Padding = new Thickness(11, 9, 7, 9),
+            Padding = new Thickness(11, 8, 9, 8),
             Margin = new Thickness(0, 2, 0, 12),
             BorderThickness = new Thickness(1),
-            Child = box,
+            Child = grid,
         };
         border.SetResourceReference(Border.BackgroundProperty, "CodeBgBrush");
         border.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
@@ -337,7 +402,7 @@ public static class MarkdownConverter
             }
 
             case MdTaskMarker marker:
-                return new Run(marker.Checked ? "\u2611 " : "\u2610 ");
+                return TaskCheckbox(marker.Checked);
 
             default:
                 // неизвестный контейнер — сохраняем содержимое
@@ -453,6 +518,38 @@ public static class MarkdownConverter
     }
 
     // ---------- Вспомогательные ----------
+
+    /// <summary>Единый чекбокс: одинаковая рамка в обоих состояниях, галочка внутри.</summary>
+    private static Inline TaskCheckbox(bool isChecked)
+    {
+        var box = new Border
+        {
+            Width = 14,
+            Height = 14,
+            CornerRadius = new CornerRadius(3),
+            BorderThickness = new Thickness(1.2),
+            Margin = new Thickness(0, 2, 5, 0),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        box.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+
+        if (isChecked)
+        {
+            var check = new System.Windows.Shapes.Path
+            {
+                Data = Geometry.Parse("M 2.5 7 L 5.5 10 L 11.5 3.5"),
+                StrokeThickness = 1.8,
+                StrokeStartLineCap = PenLineCap.Round,
+                StrokeEndLineCap = PenLineCap.Round,
+                StrokeLineJoin = PenLineJoin.Round,
+                Stretch = Stretch.Fill,
+            };
+            check.SetResourceReference(System.Windows.Shapes.Shape.StrokeProperty, "AccentBrush");
+            box.Child = check;
+        }
+
+        return new InlineUIContainer(box) { BaselineAlignment = BaselineAlignment.Center };
+    }
 
     private static void OpenUri(string url, Ctx ctx)
     {

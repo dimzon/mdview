@@ -9,7 +9,10 @@
     <sys:String x:Key="Lang.FileExit">E_xit</sys:String>
 
     <sys:String x:Key="Lang.View">_View</sys:String>
-    <sys:String x:Key="Lang.ViewDarkTheme">_Dark theme</sys:String>
+    <sys:String x:Key="Lang.ViewTheme">_Theme</sys:String>
+    <sys:String x:Key="Lang.ViewThemeAuto">_Auto</sys:String>
+    <sys:String x:Key="Lang.ViewThemeLight">_Light</sys:String>
+    <sys:String x:Key="Lang.ViewThemeDark">_Dark</sys:String>
     <sys:String x:Key="Lang.ViewLanguage">_Language</sys:String>
     <sys:String x:Key="Lang.System">_System default</sys:String>
     <sys:String x:Key="Lang.English">English</sys:String>
@@ -23,6 +26,8 @@
     <sys:String x:Key="Lang.HelpRepo">Open _GitHub repository</sys:String>
     <sys:String x:Key="Lang.HelpAbout">_About mdview</sys:String>
     <sys:String x:Key="Lang.TocTitle">Table of contents</sys:String>
+    <sys:String x:Key="Lang.Copy">Copy</sys:String>
+    <sys:String x:Key="Lang.Copied">Copied</sys:String>
 
     <sys:String x:Key="Msg.OpenError">Could not open the file:</sys:String>
     <sys:String x:Key="Msg.DropUnsupported">Supported files: .md, .markdown, .mdown, .mkd, .txt</sys:String>

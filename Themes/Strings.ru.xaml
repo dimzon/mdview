@@ -9,7 +9,10 @@
     <sys:String x:Key="Lang.FileExit">_Выход</sys:String>
 
     <sys:String x:Key="Lang.View">_Вид</sys:String>
-    <sys:String x:Key="Lang.ViewDarkTheme">_Тёмная тема</sys:String>
+    <sys:String x:Key="Lang.ViewTheme">_Тема</sys:String>
+    <sys:String x:Key="Lang.ViewThemeAuto">_Авто</sys:String>
+    <sys:String x:Key="Lang.ViewThemeLight">С_ветлая</sys:String>
+    <sys:String x:Key="Lang.ViewThemeDark">Т_ёмная</sys:String>
     <sys:String x:Key="Lang.ViewLanguage">_Язык</sys:String>
     <sys:String x:Key="Lang.System">_Как в системе</sys:String>
     <sys:String x:Key="Lang.English">English</sys:String>
@@ -23,6 +26,8 @@
     <sys:String x:Key="Lang.HelpRepo">Открыть репозиторий на _GitHub</sys:String>
     <sys:String x:Key="Lang.HelpAbout">_О программе mdview</sys:String>
     <sys:String x:Key="Lang.TocTitle">Оглавление</sys:String>
+    <sys:String x:Key="Lang.Copy">Копировать</sys:String>
+    <sys:String x:Key="Lang.Copied">Скопировано</sys:String>
 
     <sys:String x:Key="Msg.OpenError">Не удалось открыть файл:</sys:String>
     <sys:String x:Key="Msg.DropUnsupported">Поддерживаются файлы .md, .markdown, .mdown, .mkd, .txt</sys:String>

@@ -37,9 +37,9 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         // по умолчанию — тема и язык Windows; явный выбор в меню сохраняется и имеет приоритет
-        _isDark = Settings.Theme is not null ? Settings.Theme == "dark" : Settings.IsSystemDark();
+        SyncThemeMenu();
+        _isDark = ResolveTheme();
         _language = ResolveLanguage();
-        DarkThemeItem.IsChecked = _isDark;
         SyncLanguageMenu();
         ApplyTheme(_isDark);
         ApplyLanguage(_language);
@@ -177,6 +177,28 @@ public partial class MainWindow : Window
     }
 
     // ---------- Тема ----------
+
+    /// <summary>Фактическая тёмность: явный выбор или тема Windows.</summary>
+    private bool ResolveTheme() =>
+        Settings.Theme is not null ? Settings.Theme == "dark" : Settings.IsSystemDark();
+
+    private void SyncThemeMenu()
+    {
+        AutoThemeItem.IsChecked = Settings.Theme is null;
+        LightThemeItem.IsChecked = Settings.Theme == "light";
+        DarkThemeItem.IsChecked = Settings.Theme == "dark";
+    }
+
+    private void OnThemeClick(object sender, RoutedEventArgs e)
+    {
+        var theme = sender == LightThemeItem ? "light"
+            : sender == DarkThemeItem ? "dark"
+            : null; // «Авто» — как в системе
+        Settings.SetTheme(theme);
+        SyncThemeMenu();
+        _isDark = ResolveTheme();
+        ApplyTheme(_isDark);
+    }
 
     private void ApplyTheme(bool dark)
     {
@@ -335,13 +357,6 @@ public partial class MainWindow : Window
     }
 
     private void OnExitClick(object sender, RoutedEventArgs e) => Close();
-
-    private void OnToggleTheme(object sender, RoutedEventArgs e)
-    {
-        _isDark = DarkThemeItem.IsChecked;
-        ApplyTheme(_isDark);
-        Settings.SetTheme(_isDark ? "dark" : "light");
-    }
 
     private void OnToggleTocExecuted(object sender, ExecutedRoutedEventArgs e)
     {

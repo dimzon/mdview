@@ -45,7 +45,11 @@
                     <MenuItem Header="{DynamicResource Lang.FileExit}" InputGestureText="Alt+F4" Click="OnExitClick"/>
                 </MenuItem>
                 <MenuItem Header="{DynamicResource Lang.View}">
-                    <MenuItem x:Name="DarkThemeItem" Header="{DynamicResource Lang.ViewDarkTheme}" IsCheckable="True" Click="OnToggleTheme"/>
+                    <MenuItem Header="{DynamicResource Lang.ViewTheme}">
+                        <MenuItem x:Name="AutoThemeItem" Header="{DynamicResource Lang.ViewThemeAuto}" IsCheckable="True" Click="OnThemeClick"/>
+                        <MenuItem x:Name="LightThemeItem" Header="{DynamicResource Lang.ViewThemeLight}" IsCheckable="True" Click="OnThemeClick"/>
+                        <MenuItem x:Name="DarkThemeItem" Header="{DynamicResource Lang.ViewThemeDark}" IsCheckable="True" Click="OnThemeClick"/>
+                    </MenuItem>
                     <MenuItem Header="{DynamicResource Lang.ViewLanguage}">
                         <MenuItem x:Name="SystemLangItem" Header="{DynamicResource Lang.System}" IsCheckable="True" Click="OnLanguageClick"/>
                         <MenuItem x:Name="EnglishItem" Header="{DynamicResource Lang.English}" IsCheckable="True" Click="OnLanguageClick"/>

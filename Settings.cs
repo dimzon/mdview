@@ -10,7 +10,7 @@ public static class Settings
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "MdView", "settings.txt");
 
-    /// <summary>Сохранённая тема; null — пользователь ещё не выбирал (берём тему Windows).</summary>
+    /// <summary>Сохранённая тема; null — авто (следуем теме Windows).</summary>
     public static string? Theme { get; private set; }
 
     /// <summary>Сохранённый язык ("en"/"ru"); null — берём язык системы.</summary>
@@ -37,7 +37,7 @@ public static class Settings
         catch { /* настройки не критичны */ }
     }
 
-    public static void SetTheme(string theme)
+    public static void SetTheme(string? theme)
     {
         Theme = theme;
         Save();
@@ -55,8 +55,7 @@ public static class Settings
         {
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
             var sb = new StringBuilder();
-            if (Theme is not null)
-                sb.Append("theme=").Append(Theme).AppendLine();
+            sb.Append("theme=").Append(Theme ?? "auto").AppendLine();
             sb.Append("lang=").Append(Language ?? "auto").AppendLine();
             File.WriteAllText(FilePath, sb.ToString());
         }
