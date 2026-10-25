@@ -13,10 +13,11 @@
 
 ## Скачать
 
-Последний релиз — на странице [Releases](https://github.com/dimzon/mdview/releases):
+Последний релиз — на странице [Releases](https://github.com/dimzon/mdview/releases).
+Поддерживаемые платформы Windows: x64, x86, ARM64.
 
-- `mdview-vX.Y.Z-win-x64.zip` (~0,7 МБ) — нужен установленный [.NET Desktop Runtime 8](https://dotnet.microsoft.com/download/dotnet/8.0)
-- `mdview-vX.Y.Z-win-x64-selfcontained.zip` (~65 МБ) — автономный, рантайм не требуется
+- `mdview-vX.Y.Z-win-x64.zip` (и `win-x86`, `win-arm64`) — нужен установленный [.NET Desktop Runtime 8](https://dotnet.microsoft.com/download/dotnet/8.0)
+- `mdview-vX.Y.Z-win-x64-selfcontained.zip` (и `win-x86`, `win-arm64`) — автономные, рантайм не требуется
 
 ## Возможности
 
