@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Markdig;
@@ -192,6 +193,9 @@ public static class MarkdownConverter
             VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
             Padding = new Thickness(0),
         };
+        // вертикального скролла здесь нет, но ScrollViewer всё равно «съедает»
+        // колесо мыши — пробрасываем его внешнему ScrollViewer'у документа
+        box.PreviewMouseWheel += (_, e) => ForwardWheelToParent(box, e);
 
         // кнопка «Копировать» — иконка, как принято в вебе, поверх блока справа сверху
         var grid = new Grid();
@@ -552,6 +556,24 @@ public static class MarkdownConverter
     }
 
     // ---------- Вспомогательные ----------
+
+    /// <summary>
+    /// Пробрасывает колесо мыши от вложенного ScrollViewer'а (блок кода с горизонтальным
+    /// скроллом) к внешнему ScrollViewer'у документа: иначе WPF-овский ScrollViewer
+    /// помечает событие обработанным, и страница под курсором не прокручивается.
+    /// </summary>
+    private static void ForwardWheelToParent(ScrollViewer source, MouseWheelEventArgs e)
+    {
+        if (e.Handled || source.Parent is not UIElement parent)
+            return;
+
+        e.Handled = true;
+        parent.RaiseEvent(new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+        {
+            RoutedEvent = UIElement.MouseWheelEvent,
+            Source = parent,
+        });
+    }
 
     /// <summary>Иконка «копировать» (два квадратика) — стандартный веб-глиф.</summary>
     private static Geometry CreateCopyIconData()
